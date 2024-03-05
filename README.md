@@ -40,7 +40,7 @@ user = "Say hello, and ask how my day way"
 instruction = "Format the response as proper JSON"
 
 ## Call to generate text
-response = maw.generate_text(models, system, user, instruction)
+response = mah.generate_text(models, system, user, instruction)
 print(response)
 ```
 
@@ -104,11 +104,11 @@ ARRRR! Ahoy there matey! What's better than finding gold on your ship? Finding o
 Once you have run your prompt against multiple LLMs, and decided which one is best, you can get the raw response (*without the header listing the model name*) by just sending a list with only 1 model name
 
 ```python
-import MultiAiHub as maw
+import MultiAiHub as mah
 
 # Only Gemini Pro in the list
 models = [
-    maw.GEMINI_PRO
+    mah.GEMINI_PRO
 ]
 
 # Common prompt elements
@@ -117,7 +117,7 @@ user = "Say hello, and ask how my day way"
 format = "Format the response as proper JSON"
 
 ## Call to generate text
-response = maw.generate_text(models, system, user, format)
+response = mah.generate_text(models, system, user, format)
 print(response)
 ```
 #### Results when sending single model
