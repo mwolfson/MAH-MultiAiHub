@@ -5,13 +5,13 @@ If you have already setup the SDK for `Anthropic`, `OpenAI`, `Google Gemini` or 
 
 ## Usage
 
-Copy the `MultiAiHub.py` file from this repository to the same directory of the notebook where you will be using it.
+Copy the `multi_ai_hub.py` file from this repository to the same directory of the notebook where you will be using it.
 
 ### Install the AI Vendor SDKs and set API Keys
 
 To use this tool, you will need to get API keys from each of the vendors, and set them as environment variables.
 
-Setup information for installing these tools, and setting up the API keys is included in the [MultiAiHub.ipynb](./MultiAiHub.ipynb) notebook. MAH uses standard names for the environment variables, so if your configuration matches the vendor standards, this will work without needing any additional configuration.
+Setup information for installing these tools, and setting up the API keys is included in the [multi_ai_hub.ipynb](./multi_ai_hub.ipynb) notebook. MAH uses standard names for the environment variables, so if your configuration matches the vendor standards, this will work without needing any additional configuration.
 
 ## Prompt Multiple AIs at Once
 
@@ -19,7 +19,7 @@ You can issue the same prompt to multiple AIs by giving a list of which models t
 
 ```python
 # Import the code
-import MultiAiHub as mah
+import multi_ai_hub as mah
 
 # List of each model to test the prompt with
 models = [
@@ -37,10 +37,10 @@ models = [
 # Common prompt elements
 system = "You are a pirate"
 user = "Say hello, and ask how my day way"
-instruction = "Format the response as proper JSON"
+output_style = "Format the response as proper JSON"
 
 ## Call to generate text
-response = mah.generate_text(models, system, user, instruction)
+response = mah.generate_text(models, system, user, output_style)
 print(response)
 ```
 
@@ -104,7 +104,7 @@ ARRRR! Ahoy there matey! What's better than finding gold on your ship? Finding o
 Once you have run your prompt against multiple LLMs, and decided which one is best, you can get the raw response (*without the header listing the model name*) by just sending a list with only 1 model name
 
 ```python
-import MultiAiHub as mah
+import multi_ai_hub as mah
 
 # Only Gemini Pro in the list
 models = [
@@ -114,10 +114,10 @@ models = [
 # Common prompt elements
 system = "You are a pirate"
 user = "Say hello, and ask how my day way"
-instruction = "Format the response as proper JSON"
+output_style = "Format the response as proper JSON"
 
 ## Call to generate text
-response = mah.generate_text(models, system, user, instruction)
+response = mah.generate_text(models, system, user, output_style)
 print(response)
 ```
 #### Results when sending single model
@@ -134,12 +134,16 @@ Because he heard it was the best place to keep his doubloons hidden!
 
 ## Example Project
 
-Run the [mahDemo.iypnb](./mahDemo.ipynb) to see how this works yourself.
+Run the [mah_demo.ipynb](./mah_demo.ipynb) to see how this works yourself.
 
 ### Extended Logging Example
 
 Be sure to check the extended logging which shows how to include the prompt in the output, and also how to log the results to a file.
 
+This will create a single file with the prompt, and the the outputs from each AI. Then it displays that output as HTML and saves it to the filesystem 
+
+Example output file: [pirate_20240305_121024.md](./pirate_20240305_121024.md)
+
 ## Adding other models to MAH
 
-I wrote this for myself, and I hope you find it useful as well. It is very easy to add more SDKs and models to MAH, checkout the [MultiAiHub.ipynb](./MultiAiHub.ipynb) notebook where the steps are documented.
+I wrote this for myself, and I hope you find it useful as well. It is very easy to add more SDKs and models to MAH, checkout the [multi_ai_hub.ipynb](./multi_ai_hub.ipynb) notebook where the steps are documented.
