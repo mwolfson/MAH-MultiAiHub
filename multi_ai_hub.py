@@ -204,7 +204,7 @@ def generate_text_perplexity(system, user, model):
 
 # ## Test **Perplexity Helper** Function
 
-# In[17]:
+# In[ ]:
 
 
 # print(generate_text_perplexity("you are a pirate", "say hello and return the message in uppercase", "mistral-7b-instruct"))
@@ -260,41 +260,43 @@ def generate_text_anthropic(user, model="claude-3-opus-20240229"):
 # In[15]:
 
 
-# Each model has a function that translates the standard input to match the model's expected input format
-def action_anthropic_opus(system, user, format):
-    response = generate_text_anthropic(system + user + format, "claude-3-opus-20240229")
+# This is the common interface for all the models
+# It takes the **system** message, **user** message and the **output style** instructions and calls
+# the model specific function with those inputs (matching the API signature)
+def action_anthropic_opus(system, user, output_style):
+    response = generate_text_anthropic(system + user + output_style, "claude-3-opus-20240229")
     return response
 
-def action_anthropic_sonnet(system, user, format):
-    response = generate_text_anthropic(system + user + format, "claude-3-sonnet-20240229")
+def action_anthropic_sonnet(system, user, output_style):
+    response = generate_text_anthropic(system + user + output_style, "claude-3-sonnet-20240229")
     return response
 
-def action_gemini_pro(system, user, format,):
-    response = generate_text_google(system + user + format, "gemini-pro")
+def action_gemini_pro(system, user, output_style,):
+    response = generate_text_google(system + user + output_style, "gemini-pro")
     return response
 
-def action_openai_35turbo(system, user, format):
-    response = generate_text_openai(system, user + format, "gpt-3.5-turbo")
+def action_openai_35turbo(system, user, output_style):
+    response = generate_text_openai(system, user + output_style, "gpt-3.5-turbo")
     return response
 
-def action_openai_gpt4(system, user, format):
-    response = generate_text_openai(system, user + format, "gpt-4")
+def action_openai_gpt4(system, user, output_style):
+    response = generate_text_openai(system, user + output_style, "gpt-4")
     return response
 
-def action_openai_gpt4_preview(system, user, format):
-    response = generate_text_openai(system, user + format, "gpt-4-0125-preview")
+def action_openai_gpt4_preview(system, user, output_style):
+    response = generate_text_openai(system, user + output_style, "gpt-4-0125-preview")
     return response
 
-def action_mistral_7b(system, user, format):
-    response = generate_text_perplexity(system, user + format, "mistral-7b-instruct")
+def action_mistral_7b(system, user, output_style):
+    response = generate_text_perplexity(system, user + output_style, "mistral-7b-instruct")
     return response
 
-def action_mixtral_8x7b(system, user, format):
-    response = generate_text_perplexity(system, user + format, "mixtral-8x7b-instruct")
+def action_mixtral_8x7b(system, user, output_style):
+    response = generate_text_perplexity(system, user + output_style, "mixtral-8x7b-instruct")
     return response
 
-def action_sonar_medium_online(system, user, format):
-    response = generate_text_perplexity(system, user + format, "sonar-medium-online")
+def action_sonar_medium_online(system, user, output_style):
+    response = generate_text_perplexity(system, user + output_style, "sonar-medium-online")
     return response
 
 # Constants for the models
@@ -329,18 +331,18 @@ action_dict = {
 # In[16]:
 
 
-def generate_text(models, system, user, format):
+def generate_text(models, system, user, output_style):
     """
-    Generate text using the specified models.
+    Generate text responses from multiple AIs based on **models** in list.
 
-    If there is only 1 model in the list, the response will not include the model name.
+    If there is only 1 models in the list, the response will not include the model name.
     Otherwise, the response will include the model name as a header of the text generated from each model.
 
     Args:
-        models (list): A list of model names where to run the prompt.
+        models (list): A list of model names indicating which ones to run.
         system (str): The prompt *system* information to define context.
         user (str): The prompt *user* information to describe the question to ask.
-        format (str): The prompt desired *format* of the generated text.
+        output_style (str): The prompt desired *output_style* of the generated text.
 
     Returns:
         str: the generated text for all of the models in the input list
@@ -352,7 +354,7 @@ def generate_text(models, system, user, format):
         action = action_dict.get(model)
         if action:
             try:
-                response = action(system=system, user=user, format=format)
+                response = action(system=system, user=user, output_style=output_style)
                 if not is_single_model:
                     output += "\n\n# MODEL: " + model + "\n"
                 output += response
