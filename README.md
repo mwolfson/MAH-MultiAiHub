@@ -132,10 +132,14 @@ Why did the pirate bury his treasure on the beach?
 Because he heard it was the best place to keep his doubloons hidden!
 ```
 
-## Example
+## Example Project
 
 Run the [mahDemo.iypnb](./mahDemo.ipynb) to see how this works yourself.
 
-## Adding models to MAH
+### Extended Logging Example
+
+Be sure to check the extended logging which shows how to include the prompt in the output, and also how to log the results to a file.
+
+## Adding other models to MAH
 
 I wrote this for myself, and I hope you find it useful as well. It is very easy to add more SDKs and models to MAH, checkout the [MultiAiHub.ipynb](./MultiAiHub.ipynb) notebook where the steps are documented.
