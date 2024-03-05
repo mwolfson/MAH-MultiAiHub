@@ -18,17 +18,13 @@
 # - [Setting an Environment Variable on Mac/Linux](https://phoenixnap.com/kb/set-environment-variable-mac)
 # - [Setting an Environment Variable on Windows](https://phoenixnap.com/kb/windows-set-environment-variable)
 
-# #### Import Google Generative GenerativeAI library and set API Key
-# 
-# "You will need to set the Gemini API key as a system variable named: `GOOGLE_API_KEY`.  \n"
-
 # ## Tools to Get Environment Variables from OS
 # 
 # PIP Install:
 # 
 # `pip install python-dotenv`
 
-# In[ ]:
+# In[1]:
 
 
 import os
@@ -37,11 +33,15 @@ from dotenv import load_dotenv, find_dotenv
 
 # ## Setup Google GenAI
 # 
+# ### Import Google Generative GenerativeAI library and set API Key
+# 
 # PIP Install: 
 # 
 # `pip install -q google.generativeai`
+# 
+# You will need to set the Gemini API key as a system variable named: `GOOGLE_API_KEY`.
 
-# In[ ]:
+# In[2]:
 
 
 import google.generativeai as googleai
@@ -59,7 +59,7 @@ googleai.configure(api_key=apiKey,
 # Learn which models are currently available
 # 
 
-# In[ ]:
+# In[3]:
 
 
 # for m in googleai.list_models():
@@ -71,7 +71,7 @@ googleai.configure(api_key=apiKey,
 # ### Filter models to ensure model we want is supported
 # - `generateContent` is the value we are looking for
 
-# In[ ]:
+# In[4]:
 
 
 # for m in googleai.list_models():
@@ -83,7 +83,7 @@ googleai.configure(api_key=apiKey,
 # 
 # - The `@retry` decorator helps you to retry the API call if it fails.
 
-# In[ ]:
+# In[5]:
 
 
 from google.api_core import retry
@@ -96,7 +96,7 @@ def generate_text_google(prompt, model):
 
 # ### Test **Google AI Helper** function
 
-# In[ ]:
+# In[6]:
 
 
 # print(generate_text_google("Thursday evenings are perfect for", "gemini-pro"))
@@ -119,7 +119,7 @@ def generate_text_google(prompt, model):
 #   
 # 
 
-# In[ ]:
+# In[7]:
 
 
 import openai
@@ -137,7 +137,7 @@ openai.api_key  = os.getenv('OPENAI_API_KEY')
 # 
 # `pip install --upgrade openai`
 
-# In[ ]:
+# In[8]:
 
 
 from openai import OpenAI
@@ -157,7 +157,7 @@ def generate_text_openai(pre, prompt, model):
 
 # ## Test **Open AI Helper** Function
 
-# In[ ]:
+# In[9]:
 
 
 # print(generate_text_openai("You are a pirate", "Thursday evenings are perfect for", "gpt-3.5-turbo"))
@@ -167,7 +167,7 @@ def generate_text_openai(pre, prompt, model):
 # 
 # You will need a key set to `PERPLEXITY_API_KEY`
 
-# In[ ]:
+# In[10]:
 
 
 import os
@@ -175,14 +175,14 @@ import os
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-YOUR_API_KEY = os.getenv('PERPLEXITY_API_KEYXXX')
+YOUR_API_KEY = os.getenv('PERPLEXITY_API_KEY')
 
 
 # ## Perplexity Helper function
 # 
 # No PIP dependency
 
-# In[ ]:
+# In[11]:
 
 
 from openai import OpenAI
@@ -204,7 +204,7 @@ def generate_text_perplexity(system, user, model):
 
 # ## Test **Perplexity Helper** Function
 
-# In[ ]:
+# In[17]:
 
 
 # print(generate_text_perplexity("you are a pirate", "say hello and return the message in uppercase", "mistral-7b-instruct"))
@@ -221,7 +221,7 @@ def generate_text_perplexity(system, user, model):
 # `pip install anthropic`
 # 
 
-# In[ ]:
+# In[13]:
 
 
 from anthropic import Anthropic
@@ -245,19 +245,19 @@ def generate_text_anthropic(user, model="claude-3-opus-20240229"):
 
 # ### Test the Anthropic API directly
 
-# In[ ]:
+# In[14]:
 
 
 # print(generate_text_anthropic("you are a pirate" + "say hello and return the message in uppercase", "claude-3-opus-20240229"))
 
 
-# ## Proxy to Previously Defined Functions
+# ## Add Actions to map to different models and AI providers
 
 # 1. Define a function for each model you want to test
 # 2. Create a constant to reference that model
 # 3. Add both to the dictionary
 
-# In[ ]:
+# In[15]:
 
 
 # Each model has a function that translates the standard input to match the model's expected input format
@@ -294,7 +294,7 @@ def action_mixtral_8x7b(system, user, format):
     return response
 
 def action_sonar_medium_online(system, user, format):
-    response = generate_text_perplexity("", system + user + format, "sonar-medium-online")
+    response = generate_text_perplexity(system, user + format, "sonar-medium-online")
     return response
 
 # Constants for the models
@@ -324,7 +324,9 @@ action_dict = {
         
 
 
-# In[1]:
+# ## Main Entry Point to call appropriate functions based which are requested in `models` list
+
+# In[16]:
 
 
 def generate_text(models, system, user, format):
