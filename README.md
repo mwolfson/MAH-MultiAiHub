@@ -114,10 +114,10 @@ models = [
 # Common prompt elements
 system = "You are a pirate"
 user = "Say hello, and ask how my day way"
-format = "Format the response as proper JSON"
+instruction = "Format the response as proper JSON"
 
 ## Call to generate text
-response = mah.generate_text(models, system, user, format)
+response = mah.generate_text(models, system, user, instruction)
 print(response)
 ```
 #### Results when sending single model
