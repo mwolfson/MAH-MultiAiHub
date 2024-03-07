@@ -31,6 +31,22 @@ import os
 from dotenv import load_dotenv, find_dotenv
 
 
+# ## Adding other models
+# 
+# ### Check for Provider *Helper* Function
+# 
+# This is organized into API providers, there are helper functions for:
+# - [**Anthropic**](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
+# - [**Google**](https://ai.google.dev/)
+# - [**Hugging Face**](https://huggingface.co/docs/huggingface_hub/en/package_reference/inference_client)
+# - [**OpenAI**](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)
+# - [**Perplexity**](https://docs.perplexity.ai/)
+# 
+# Create a new helper function if necessary, then skip to the bottom, and add your calls to the Action dictionary, where these are mapped (pretty simple)
+# 
+# Happy Model Comparing!
+#   
+
 # ## Setup Google GenAI
 # 
 # ### Import Google Generative GenerativeAI library and set API Key
@@ -251,6 +267,73 @@ def generate_text_anthropic(user, model="claude-3-opus-20240229"):
 # print(generate_text_anthropic("you are a pirate" + "say hello and return the message in uppercase", "claude-3-opus-20240229"))
 
 
+# ## Setup Hugging Face
+# 
+# ### PIP Install Hugging Face Hub
+# 
+# `pip install --upgrade huggingface_hub`
+# 
+# ### Get API Key
+# 
+# Head to HuggingFace [Settings Page](https://huggingface.co/settings/tokens) and create an API token.
+# 
+# and set it as an environment variable named: `HUGGING_FACE_HUB_TOKEN`
+
+# In[3]:
+
+
+import os
+
+from dotenv import load_dotenv, find_dotenv
+_ = load_dotenv(find_dotenv())
+
+HF_API_KEY = os.getenv('HUGGING_FACE_HUB_TOKEN')
+
+
+# ## Hugging Face Helper function using the InferenceClient
+
+# ### Use the InferenceClient to check if a model is available
+
+# In[ ]:
+
+
+# bigscience/bloom | bigcode/starcoder
+
+# from huggingface_hub import InferenceClient
+# client = InferenceClient()
+# client.get_model_status("bigscience/bloom")
+
+
+# ### Must Enable Models In Hugging Face to use them 
+# 
+# **Note** - to use HF models (which can be an URL to a private model, or a `model_id`) you will need to load that [model](https://huggingface.co/models) into your Hugging Face profile first.
+# 
+# Some models are available without enabling them. The first models includes `bloom` which is already enabling, and `gemma7b` which is one that requires to enable it first before using.
+
+# In[42]:
+
+
+from huggingface_hub import InferenceClient, InferenceTimeoutError
+
+def generate_text_huggingface(user, model=""):
+    try:
+        huggingface_client = InferenceClient(model=model, token=HF_API_KEY, timeout=60)
+        response = huggingface_client.text_generation(user, max_new_tokens=1024)
+    except InferenceTimeoutError:
+        print("Inference timed out after 60s.")
+    return response
+
+
+
+
+# ### Test the Hugging Face Helper function directly
+
+# In[ ]:
+
+
+# generate_text_huggingface("you are a pirate tell me your favorite color", "google/gemma-7b")
+
+
 # ## Add Actions to map to different models and AI providers
 
 # 1. Define a function for each model you want to test
@@ -273,6 +356,14 @@ def action_anthropic_sonnet(system, user, output_style):
 
 def action_gemini_pro(system, user, output_style,):
     response = generate_text_google(system + user + output_style, "gemini-pro")
+    return response
+
+def action_huggingface_bloom(system, user, output_style,):
+    response = generate_text_huggingface(system + user + output_style, "bigscience/bloom")
+    return response
+
+def action_huggingface_gemma7b(system, user, output_style,):
+    response = generate_text_huggingface(system + user + output_style, "google/gemma-7b")
     return response
 
 def action_openai_35turbo(system, user, output_style):
@@ -303,6 +394,8 @@ def action_sonar_medium_online(system, user, output_style):
 ANTHROPIC_OPUS = "claude-3-opus-20240229"
 ANTHROPIC_SONNET = "claude-3-sonnet-20240229"
 GEMINI_PRO = "gemini-pro"
+HUGGINGFACE_BLOOM = "bigscience/bloom"
+HUGGINGFACE_GEMMA7B = "google/gemma-7b"
 OPEN_AI_GPT35TURBO = "gpt-3.5-turbo"
 OPEN_AI_GPT4 = "gpt-4"
 OPEN_AI_GPT4PREVIEW = "gpt-4-0125-preview"
@@ -315,6 +408,8 @@ action_dict = {
     ANTHROPIC_OPUS: action_anthropic_opus,
     ANTHROPIC_SONNET: action_anthropic_sonnet,
     GEMINI_PRO: action_gemini_pro,
+    HUGGINGFACE_BLOOM: action_huggingface_bloom,
+    HUGGINGFACE_GEMMA7B: action_huggingface_gemma7b,
     OPEN_AI_GPT35TURBO: action_openai_35turbo,
     OPEN_AI_GPT4: action_openai_gpt4,
     OPEN_AI_GPT4PREVIEW: action_openai_gpt4_preview,
