@@ -1,4 +1,17 @@
+- [MAH - Multi AI Hub](#mah---multi-ai-hub)
+  - [Usage](#usage)
+    - [Currently Supported AI Vendors](#currently-supported-ai-vendors)
+      - [Install the AI Vendor SDKs and set API Keys](#install-the-ai-vendor-sdks-and-set-api-keys)
+  - [Prompt Multiple AIs at Once](#prompt-multiple-ais-at-once)
+      - [Results from sending list of models](#results-from-sending-list-of-models)
+    - [Prompt Single AI to get Raw result](#prompt-single-ai-to-get-raw-result)
+      - [Results when sending single model](#results-when-sending-single-model)
+  - [Example Project](#example-project)
+    - [Extended Logging Example](#extended-logging-example)
+  - [Adding other models to MAH](#adding-other-models-to-mah)
+
 # MAH - Multi AI Hub
+
 **MAH - Multi AI Hub** is a project designed to make it easy to send the same prompt to multiple LLMs to help with testing and comparison.
 
 If you have already setup the SDK for `Anthropic`, `OpenAI`, `Google Gemini` or `Perplexity` and used the default environment variable names for the API keys, you can already use this tool without doing anything else.
@@ -7,7 +20,15 @@ If you have already setup the SDK for `Anthropic`, `OpenAI`, `Google Gemini` or 
 
 Copy the `multi_ai_hub.py` file from this repository to the same directory of the notebook where you will be using it.
 
-### Install the AI Vendor SDKs and set API Keys
+### Currently Supported AI Vendors
+
+- [**Anthropic**](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
+- [**Google**](https://ai.google.dev/)
+- [**Hugging Face**](https://huggingface.co/docs/huggingface_hub/en/package_reference/inference_client)
+- [**OpenAI**](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)
+- [**Perplexity**](https://docs.perplexity.ai/)
+
+#### Install the AI Vendor SDKs and set API Keys
 
 To use this tool, you will need to get API keys from each of the vendors, and set them as environment variables.
 
@@ -21,7 +42,7 @@ You can issue the same prompt to multiple AIs by giving a list of which models t
 # Import the code
 import multi_ai_hub as mah
 
-# List of each model to test the prompt with
+# List each model to test your prompt with
 models = [
     mah.ANTHROPIC_OPUS,
     mah.ANTHROPIC_SONNET,    
@@ -46,7 +67,7 @@ print(response)
 
 #### Results from sending list of models
 
-When you run this with more then 1 model, the output will include a header with a name to identify the model used:
+When you run this with more then 1 model, the output includes a header with a name to identify the model used:
 
 `# MODEL: <model name>`
 
