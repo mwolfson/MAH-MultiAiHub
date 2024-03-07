@@ -30,9 +30,9 @@ Copy the `multi_ai_hub.py` file from this repository to the same directory of th
 
 #### Install the AI Vendor SDKs and set API Keys
 
-To use this tool, you will need to get API keys from each of the vendors, and set them as environment variables.
+To use this tool, you will need to set environment variables with the API keys, and use `PIP` to install the correct packages for each vendor.
 
-Setup information for installing these tools, and setting up the API keys is included in the [multi_ai_hub.ipynb](./multi_ai_hub.ipynb) notebook. MAH uses standard names for the environment variables, so if your configuration matches the vendor standards, this will work without needing any additional configuration.
+Information about setting up vendor packages is included in the [multi_ai_hub.ipynb](./multi_ai_hub.ipynb) notebook. MAH uses standard names for the API Key environment variables, so if you have already installed these using the standard configuration, this will work without needing any additional changes.
 
 ## Prompt Multiple AIs at Once
 
