@@ -24,7 +24,7 @@
 # 
 # `pip install python-dotenv`
 
-# In[51]:
+# In[ ]:
 
 
 import os
@@ -38,9 +38,7 @@ from dotenv import load_dotenv, find_dotenv
 # This is organized into API providers, there are helper functions for:
 # - [**Anthropic**](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
 # - [**Google**](https://ai.google.dev/)
-# - [**Hugging Face**](https://huggingface.co/docs/huggingface_hub/en/package_reference/inference_client)
 # - [**OpenAI**](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)
-# - [**NVidia**](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)
 # - [**Perplexity**](https://docs.perplexity.ai/)
 # 
 # Create a new helper function if necessary, then skip to the bottom, and add your calls to the Action dictionary, where these are mapped (pretty simple)
@@ -58,7 +56,7 @@ from dotenv import load_dotenv, find_dotenv
 # 
 # You will need to set the Gemini API key as a system variable named: `GOOGLE_API_KEY`.
 
-# In[52]:
+# In[ ]:
 
 
 import google.generativeai as googleai
@@ -71,12 +69,34 @@ googleai.configure(api_key=apiKey,
     )
 
 
+# ## Customize Gemini Settings
+# 
+# Use `generation_config` to specify various things (Ex. `temperature`, and `max_output_tokens`)
+# 
+# Use `safety_settings` to check the output to ensure it is free of harmful language.
+
+# In[ ]:
+
+
+from google.generativeai.types import HarmCategory, HarmBlockThreshold, GenerationConfig
+
+generation_config = GenerationConfig(
+    temperature=0.1,
+    max_output_tokens=4096
+)
+
+safety_settings = {
+    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE
+}
+
+
 # ## Explore the Available Models
 # 
 # Learn which models are currently available
 # 
 
-# In[53]:
+# In[ ]:
 
 
 # for m in googleai.list_models():
@@ -88,7 +108,7 @@ googleai.configure(api_key=apiKey,
 # ### Filter models to ensure model we want is supported
 # - `generateContent` is the value we are looking for
 
-# In[54]:
+# In[ ]:
 
 
 # for m in googleai.list_models():
@@ -100,23 +120,27 @@ googleai.configure(api_key=apiKey,
 # 
 # - The `@retry` decorator helps you to retry the API call if it fails.
 
-# In[55]:
+# In[ ]:
 
 
 from google.api_core import retry
 @retry.Retry()
 def generate_text_google(prompt, model):
-    model = googleai.GenerativeModel(model)
+    model = googleai.GenerativeModel(
+        model_name=model,
+        generation_config=generation_config,
+        safety_settings=safety_settings
+        )
     response = model.generate_content(prompt)
     return response.text
 
 
 # ### Test **Google AI Helper** function
 
-# In[56]:
+# In[ ]:
 
 
-# print(generate_text_google("Thursday evenings are perfect for", "gemini-pro"))
+#print(generate_text_google("Thursday evenings are perfect for", "gemini-1.5-flash-latest"))
 
 
 # ## Setup Open AI APIs
@@ -136,7 +160,7 @@ def generate_text_google(prompt, model):
 #   
 # 
 
-# In[57]:
+# In[ ]:
 
 
 import openai
@@ -154,7 +178,7 @@ openai.api_key  = os.getenv('OPENAI_API_KEY')
 # 
 # `pip install --upgrade openai`
 
-# In[58]:
+# In[ ]:
 
 
 from openai import OpenAI
@@ -174,17 +198,17 @@ def generate_text_openai(pre, prompt, model):
 
 # ## Test **Open AI Helper** Function
 
-# In[59]:
+# In[ ]:
 
 
-#print(generate_text_openai("You are a pirate", "Thursday evenings are perfect for", "gpt-3.5-turbo"))
+#print(generate_text_openai("You are a pirate", "Thursday evenings are perfect for", "gpt-4o"))
 
 
 # ## Setup Perplexity API
 # 
 # You will need a key set to `PERPLEXITY_API_KEY`
 
-# In[60]:
+# In[ ]:
 
 
 import os
@@ -199,7 +223,7 @@ YOUR_API_KEY = os.getenv('PERPLEXITY_API_KEY')
 # 
 # No PIP dependency, you **must** have the **OpenAI SDK Installed**.
 
-# In[61]:
+# In[ ]:
 
 
 from openai import OpenAI
@@ -221,7 +245,7 @@ def generate_text_perplexity(system, user, model):
 
 # ## Test **Perplexity Helper** Function
 
-# In[62]:
+# In[ ]:
 
 
 #print(generate_text_perplexity("you are a pirate", "say hello and return the message in uppercase", "mistral-7b-instruct"))
@@ -238,7 +262,7 @@ def generate_text_perplexity(system, user, model):
 # `pip install anthropic`
 # 
 
-# In[63]:
+# In[ ]:
 
 
 from anthropic import Anthropic
@@ -262,127 +286,10 @@ def generate_text_anthropic(user, model="claude-3-opus-20240229"):
 
 # ### Test the Anthropic API directly
 
-# In[64]:
+# In[ ]:
 
 
 # print(generate_text_anthropic("you are a pirate" + "say hello and return the message in uppercase", "claude-3-opus-20240229"))
-
-
-# ## Setup Hugging Face
-# 
-# ### PIP Install Hugging Face Hub
-# 
-# `pip install --upgrade huggingface_hub`
-# 
-# ### Get API Key
-# 
-# Head to HuggingFace [Settings Page](https://huggingface.co/settings/tokens) and create an API token.
-# 
-# and set it as an environment variable named: `HUGGING_FACE_HUB_TOKEN`
-
-# In[65]:
-
-
-import os
-
-from dotenv import load_dotenv, find_dotenv
-_ = load_dotenv(find_dotenv())
-
-HF_API_KEY = os.getenv('HUGGING_FACE_HUB_TOKEN')
-
-
-# ## Hugging Face Helper function using the InferenceClient
-
-# ### Use the InferenceClient to check if a model is available
-
-# In[66]:
-
-
-# bigscience/bloom | bigcode/starcoder
-
-# from huggingface_hub import InferenceClient
-# client = InferenceClient()
-# client.get_model_status("bigscience/bloom")
-
-
-# ### Must Enable Models In Hugging Face to use them 
-# 
-# **Note** - to use HF models (which can be an URL to a private model, or a `model_id`) you will need to load that [model](https://huggingface.co/models) into your Hugging Face profile first.
-# 
-# Some models are available without enabling them. The first models includes `bloom` which is already enabling, and `gemma7b` which is one that requires to enable it first before using.
-
-# In[67]:
-
-
-from huggingface_hub import InferenceClient, InferenceTimeoutError
-
-def generate_text_huggingface(user, model=""):
-    try:
-        huggingface_client = InferenceClient(model=model, token=HF_API_KEY, timeout=60)
-        response = huggingface_client.text_generation(user, max_new_tokens=1024)
-    except InferenceTimeoutError:
-        print("Inference timed out after 60s.")
-    return response
-
-
-
-
-# ### Test the Hugging Face Helper function directly
-
-# In[68]:
-
-
-#generate_text_huggingface("you are a pirate tell me your favorite color", "meta-llama/Llama-2-7b")
-
-
-# ## Setup NVidia NGC
-# 
-# You must go to (NVidia Builder Portal)[https://build.nvidia.com/] to setup an API key to use their models.
-# 
-# For this function you **must** have the **Open AI SDK Installed** since there is no SDK for NVidia.
-
-# In[69]:
-
-
-from dotenv import load_dotenv, find_dotenv
-_ = load_dotenv(find_dotenv())
-
-NVIDIA_API_KEY = os.getenv('NVIDIA_API_KEY')
-
-
-# ### Helper function for using NVidia Inference APIs
-
-# In[70]:
-
-
-nvidia_client = OpenAI(
-  base_url = "https://integrate.api.nvidia.com/v1",
-  api_key = NVIDIA_API_KEY
-)
-
-def generate_text_ngc(system, user, model):
-  completion = nvidia_client.chat.completions.create(
-    model=model,
-    messages=[
-      {"role":"system","content":system},
-      {"role":"user","content":user},
-      
-    ],
-    max_tokens=1024
-  )
-
-  content = completion.choices[0].message.content
-  return content
-
-
-# ### Test for the NVidia function
-
-# 
-
-# In[71]:
-
-
-#print(generate_text_ngc("you are a pirate", "you are a pirate tell me your favorite color", "meta/llama3-8b"))
 
 
 # ## Add Actions to map to different models and AI providers
@@ -391,99 +298,93 @@ def generate_text_ngc(system, user, model):
 # 2. Create a constant to reference that model
 # 3. Add both to the dictionary
 
-# In[72]:
+# In[ ]:
 
+
+# Constants for the models - use the unique name of the model as defined in the SDK
+ANTHROPIC_OPUS = "claude-3-opus-20240229"
+ANTHROPIC_SONNET = "claude-3-5-sonnet-20240620"
+GEMINI_PRO = "gemini-pro"
+GEMINI_FLASH = "gemini-1.5-flash-latest"
+OPEN_AI_GPT35TURBO = "gpt-3.5-turbo"
+OPEN_AI_GPT4 = "gpt-4"
+OPEN_AI_GPT4O = "gpt-4o"
+OPEN_AI_GPT4PREVIEW = "gpt-4-0125-preview"
+PPLX_LLAMA3_8B = "llama-3-8b-instruct"
+PPLX_LLAMA3_70B = "llama-3-70b-instruct"
+PPLX_MISTRAL_7B = "mistral-7b-instruct"
+PPLX_MIXTRAL_8X7B = "mixtral-8x7b-instruct"
+SONAR_MED_ONLINE = "sonar-medium-online"
 
 # This is the common interface for all the models
 # It takes the **system** message, **user** message and the **output style** instructions and calls
 # the model specific function with those inputs (matching the API signature)
 def action_anthropic_opus(system, user, output_style):
-    response = generate_text_anthropic(system + user + output_style, "claude-3-opus-20240229")
+    response = generate_text_anthropic(system + user + output_style, ANTHROPIC_OPUS)
     return response
 
 def action_anthropic_sonnet(system, user, output_style):
-    response = generate_text_anthropic(system + user + output_style, "claude-3-sonnet-20240229")
+    response = generate_text_anthropic(system + user + output_style, ANTHROPIC_SONNET)
     return response
 
 def action_gemini_pro(system, user, output_style,):
-    response = generate_text_google(system + user + output_style, "gemini-pro")
+    response = generate_text_google(system + user + output_style, GEMINI_PRO)
     return response
 
-def action_huggingface_bloom(system, user, output_style,):
-    response = generate_text_huggingface(system + user + output_style, "bigscience/bloom")
-    return response
-
-def action_huggingface_gemma7b(system, user, output_style,):
-    response = generate_text_huggingface(system + user + output_style, "google/gemma-7b")
-    return response
-
-def action_huggingface_llama2_7b(system, user, output_style,):
-    response = generate_text_huggingface(system + user + output_style, "meta-llama/Llama-2-7b")
+def action_gemini_flash(system, user, output_style,):
+    response = generate_text_google(system + user + output_style, GEMINI_FLASH)
     return response
 
 def action_openai_35turbo(system, user, output_style):
-    response = generate_text_openai(system, user + output_style, "gpt-3.5-turbo")
+    response = generate_text_openai(system, user + output_style, OPEN_AI_GPT35TURBO)
     return response
 
 def action_openai_gpt4(system, user, output_style):
-    response = generate_text_openai(system, user + output_style, "gpt-4")
+    response = generate_text_openai(system, user + output_style, OPEN_AI_GPT4)
+    return response
+
+def action_openai_gpt4o(system, user, output_style):
+    response = generate_text_openai(system, user + output_style, OPEN_AI_GPT4O)
     return response
 
 def action_openai_gpt4_preview(system, user, output_style):
-    response = generate_text_openai(system, user + output_style, "gpt-4-0125-preview")
+    response = generate_text_openai(system, user + output_style, OPEN_AI_GPT4PREVIEW)
     return response
 
-def action_mistral_7b(system, user, output_style):
-    response = generate_text_perplexity(system, user + output_style, "mistral-7b-instruct")
+def action_pplxllama_8b(system, user, output_style):
+    response = generate_text_perplexity(system, user + output_style, PPLX_LLAMA3_8B)
     return response
 
-def action_mixtral_8x7b(system, user, output_style):
-    response = generate_text_perplexity(system, user + output_style, "mixtral-8x7b-instruct")
+def action_pplxllama_70b(system, user, output_style):
+    response = generate_text_perplexity(system, user + output_style, PPLX_LLAMA3_70B)
     return response
 
-def action_nvidia_llama3_8b(system, user, output_style):
-    response = generate_text_ngc(system, user + output_style, "meta/llama3-8b")
+def action_pplxmistral_7b(system, user, output_style):
+    response = generate_text_perplexity(system, user + output_style, PPLX_MISTRAL_7B)
     return response
 
-def action_nvidia_llama3_70b(system, user, output_style):
-    response = generate_text_ngc(system, user + output_style, "meta/llama3-70b")
+def action_pplxmixtral_8x7b(system, user, output_style):
+    response = generate_text_perplexity(system, user + output_style, PPLX_MIXTRAL_8X7B)
     return response
 
 def action_sonar_medium_online(system, user, output_style):
-    response = generate_text_perplexity(system, user + output_style, "sonar-medium-online")
+    response = generate_text_perplexity(system, user + output_style, SONAR_MED_ONLINE)
     return response
 
-# Constants for the models - this name is arbitrary, should be unique
-ANTHROPIC_OPUS = "claude-3-opus-20240229"
-ANTHROPIC_SONNET = "claude-3-sonnet-20240229"
-GEMINI_PRO = "gemini-pro"
-HUGGINGFACE_BLOOM = "bigscience/bloom"
-HUGGINGFACE_GEMMA7B = "google/gemma-7b"
-HUGGINGFACE_LLAMA2_7B = "meta-llama/Llama-2-7b"
-OPEN_AI_GPT35TURBO = "gpt-3.5-turbo"
-OPEN_AI_GPT4 = "gpt-4"
-OPEN_AI_GPT4PREVIEW = "gpt-4-0125-preview"
-MISTRAL_7B = "mistral-7b-instruct"
-MIXTRAL_8X7B = "mixtral-8x7b-instruct"
-NVIDIA_LLAMA3_8B = "meta/llama3-8b"
-NVIDIA_LLAMA3_70B = "meta/llama3-70b"
-SONAR_MED_ONLINE = "sonar-medium-online"
-
-# Dictionary mapping models to their respective functions
+# Dictionary mapping models to their respective functions will be used by the client
 action_dict = {
     ANTHROPIC_OPUS: action_anthropic_opus,
     ANTHROPIC_SONNET: action_anthropic_sonnet,
     GEMINI_PRO: action_gemini_pro,
-    HUGGINGFACE_BLOOM: action_huggingface_bloom,
-    HUGGINGFACE_GEMMA7B: action_huggingface_gemma7b,
-    HUGGINGFACE_LLAMA2_7B: action_huggingface_llama2_7b,
+    GEMINI_FLASH: action_gemini_flash,
     OPEN_AI_GPT35TURBO: action_openai_35turbo,
     OPEN_AI_GPT4: action_openai_gpt4,
+    OPEN_AI_GPT4O: action_openai_gpt4o,
     OPEN_AI_GPT4PREVIEW: action_openai_gpt4_preview,
-    MISTRAL_7B: action_mistral_7b,
-    MIXTRAL_8X7B: action_mixtral_8x7b,
-    NVIDIA_LLAMA3_8B: action_nvidia_llama3_8b,
-    NVIDIA_LLAMA3_70B: action_nvidia_llama3_70b,
+    PPLX_LLAMA3_8B: action_pplxllama_8b,
+    PPLX_LLAMA3_70B: action_pplxllama_70b,
+    PPLX_MISTRAL_7B: action_pplxmistral_7b,
+    PPLX_MIXTRAL_8X7B: action_pplxmixtral_8x7b,
     SONAR_MED_ONLINE: action_sonar_medium_online
 }
 
@@ -492,7 +393,7 @@ action_dict = {
 
 # ## Main Entry Point to call appropriate functions based which are requested in `models` list
 
-# In[73]:
+# In[ ]:
 
 
 def generate_text(models, system, user, output_style):
@@ -532,9 +433,40 @@ def generate_text(models, system, user, output_style):
     return output
 
 
+# ## Test Method
+# 
+# This method will run the MAH with all the models you want to test...this is convenient to check if all the inference calls work as expected.
+
+# In[ ]:
+
+
+# models = [    
+#     ANTHROPIC_OPUS,
+#     ANTHROPIC_SONNET,
+#     GEMINI_PRO,
+#     GEMINI_FLASH,
+#     OPEN_AI_GPT35TURBO,
+#     OPEN_AI_GPT4,
+#     OPEN_AI_GPT4O,
+#     OPEN_AI_GPT4PREVIEW,
+#     PPLX_LLAMA3_8B,
+#     PPLX_LLAMA3_70B,
+#     SONAR_MED_ONLINE
+# ]
+
+# system = "You are a pirate"
+# user = "Make a greeting and tell me a joke about treasure"
+# output_style = "Output the response in all capital letters"
+
+# response = generate_text(models, system, user, output_style)
+
+# # Output the response to the console
+# print(response)
+
+
 # ## Final Step
 # 
-# Generate the python script to run this:
+# After making changes to this notebook, run the following on the command-line to create the python script to use:
 # 
 # ```
 # jupyter nbconvert --to script .\multi_ai_hub.ipynb
