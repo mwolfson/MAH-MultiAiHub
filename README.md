@@ -24,9 +24,7 @@ Copy the `multi_ai_hub.py` file from this repository to the same directory of th
 
 - [**Anthropic**](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
 - [**Google**](https://ai.google.dev/)
-- [**Hugging Face**](https://huggingface.co/docs/huggingface_hub/en/package_reference/inference_client)
 - [**OpenAI**](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)
-- [**NVidia**](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)
 - [**Perplexity**](https://docs.perplexity.ai/)
 
 #### Install the AI Vendor SDKs and set API Keys
