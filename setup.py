@@ -13,9 +13,9 @@ setup(
     packages=find_packages(),
     py_modules=["multi_ai_hub"],
     install_requires=[
-        'python-dotenv',
-        'google.generativeai',
-        'openai',
-        'anthropic',
+        'python-dotenv==1.0.0',
+        'google.generativeai==0.5.4',
+        'openai==1.35.2',
+        'anthropic==0.17.0',
     ],
 )
