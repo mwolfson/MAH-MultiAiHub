@@ -292,6 +292,54 @@ def generate_text_anthropic(user, model="claude-3-opus-20240229"):
 # print(generate_text_anthropic("you are a pirate" + "say hello and return the message in uppercase", "claude-3-opus-20240229"))
 
 
+# ## <a name="azure_api"></a>Setup Azure
+# 
+# Check the [docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal), and get a project setup.
+# 
+# You will need an Project URI and an API_KEY and you should create environment variables for these, with the following names:
+# 
+# - AZURE_ENDPOINT_URL
+# - AZURE_OPENAI_API_KEY
+# 
+# ### Import SDK 
+# 
+# There is no additional dependencies, because this uses the OpenAI SDK.
+
+# In[ ]:
+
+
+import os
+from openai import AzureOpenAI
+
+endpoint = os.getenv('AZURE_ENDPOINT_URL')
+apiKey = os.getenv('AZURE_OPENAI_API_KEY')
+      
+client = AzureOpenAI(
+    azure_endpoint=endpoint,
+    api_key=apiKey,
+    api_version="2024-05-01-preview",
+)
+
+def generate_text_azure(pre, prompt, model="gpt-4"):
+    completion = client.chat.completions.create(
+    model=model,
+    messages=[
+        {"role": "system", "content": pre},
+        {"role": "user", "content": prompt}
+    ]
+    )
+
+    return completion.choices[0].message.content
+
+
+# ### Test the Azure Endpoint directly
+
+# In[ ]:
+
+
+# print(generate_text_azure("you are a pirate", "say hello and return the message in uppercase", "gpt-4"))
+
+
 # ## Add Actions to map to different models and AI providers
 
 # 1. Define a function for each model you want to test
@@ -304,6 +352,7 @@ def generate_text_anthropic(user, model="claude-3-opus-20240229"):
 # Constants for the models - use the unique name of the model as defined in the SDK
 ANTHROPIC_OPUS = "claude-3-opus-20240229"
 ANTHROPIC_SONNET = "claude-3-5-sonnet-20240620"
+AZURE_GPT4 = "gpt-4"
 GEMINI_PRO = "gemini-pro"
 GEMINI_FLASH = "gemini-1.5-flash-latest"
 OPEN_AI_GPT35TURBO = "gpt-3.5-turbo"
@@ -325,6 +374,10 @@ def action_anthropic_opus(system, user, output_style):
 
 def action_anthropic_sonnet(system, user, output_style):
     response = generate_text_anthropic(system + user + output_style, ANTHROPIC_SONNET)
+    return response
+
+def action_azure_gpt4(system, user, output_style):
+    response = generate_text_azure(system, user + output_style, AZURE_GPT4)
     return response
 
 def action_gemini_pro(system, user, output_style,):
@@ -375,6 +428,7 @@ def action_sonar_medium_online(system, user, output_style):
 action_dict = {
     ANTHROPIC_OPUS: action_anthropic_opus,
     ANTHROPIC_SONNET: action_anthropic_sonnet,
+    AZURE_GPT4: action_azure_gpt4,
     GEMINI_PRO: action_gemini_pro,
     GEMINI_FLASH: action_gemini_flash,
     OPEN_AI_GPT35TURBO: action_openai_35turbo,
@@ -442,16 +496,7 @@ def generate_text(models, system, user, output_style):
 
 # models = [    
 #     ANTHROPIC_OPUS,
-#     ANTHROPIC_SONNET,
-#     GEMINI_PRO,
-#     GEMINI_FLASH,
-#     OPEN_AI_GPT35TURBO,
-#     OPEN_AI_GPT4,
-#     OPEN_AI_GPT4O,
-#     OPEN_AI_GPT4PREVIEW,
-#     PPLX_LLAMA3_8B,
-#     PPLX_LLAMA3_70B,
-#     SONAR_MED_ONLINE
+#     AZURE_GPT4
 # ]
 
 # system = "You are a pirate"
