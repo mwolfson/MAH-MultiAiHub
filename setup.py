@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='multiaihub',
-    version='0.1.7',  # Start with a version number
+    version='0.1.8',  # Start with a version number
     description='MAH makes it easy to send the same prompt to multiple LLMs',
     license='Apache License 2.0',
     long_description="MAH - Multi AI Hub is a project designed to make it easy to send the same prompt to multiple LLMs to help with testing and comparison.",

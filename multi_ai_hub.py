@@ -37,6 +37,8 @@ from dotenv import load_dotenv, find_dotenv
 # 
 # This is organized into API providers, there are helper functions for:
 # - [**Anthropic**](#anthropic_api) | [API Docs](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
+# - [**AWS Bedrock**](#aws_api) | [API Docs](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html)
+# - [**Azure**](#azure_api) | [API Docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal)
 # - [**Google**](#google_api) | [API Docs](https://ai.google.dev/)
 # - [**OpenAI**](#openai_api) | [API Docs](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)
 # - [**Perplexity**](#pplx_api) | [API Docs](https://docs.perplexity.ai/)
@@ -340,6 +342,71 @@ def generate_text_azure(pre, prompt, model="gpt-4"):
 # print(generate_text_azure("you are a pirate", "say hello and return the message in uppercase", "gpt-4"))
 
 
+# ## <a name="aws_api"></a>Setup AWS Bedrock
+# 
+# Check the [docs](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html), and get a project setup. You will need to setup a project, and request access to the models you wish to use.
+# 
+# You will need 2 values with environment variables having the following names:
+# 
+# - AWS_ACCESS_KEY_ID,
+# - AWS_SECRET_ACCESS_KEY
+# 
+# ### Import SDK 
+# 
+# `pip install boto3 requests`
+
+# In[ ]:
+
+
+import json
+import boto3
+
+# Fetch AWS credentials from environment variables
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')  # Default to us-east-1 if not set
+
+# # Ensure credentials are set
+# if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
+#     raise ValueError("AWS credentials not found in environment variables")
+
+# Create a Bedrock client
+bedrock_client = boto3.client(
+    service_name='bedrock-runtime',
+    region_name=AWS_REGION,
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+)
+
+def generate_text_aws(pre, prompt, model="ai21.j2-mid-v1"):
+    body = json.dumps({
+            "prompt": pre + prompt,
+            "maxTokens": 2048,
+            "temperature": 0.1,
+            "topP": 1,
+            "stopSequences": [],
+            "countPenalty": {"scale": 0},
+            "presencePenalty": {"scale": 0},
+            "frequencyPenalty": {"scale": 0}
+        })
+    
+    response = bedrock_client.invoke_model(
+            modelId='ai21.j2-mid-v1',
+            body=body
+        )
+    
+    response_body = json.loads(response['body'].read())
+    return response_body['completions'][0]['data']['text']
+
+
+# ### Test the AWS Endpoint directly
+
+# In[ ]:
+
+
+# print(generate_text_aws("you are a pirate", "say hello and return the message in uppercase", "ai21.j2-mid-v1"))
+
+
 # ## Add Actions to map to different models and AI providers
 
 # 1. Define a function for each model you want to test
@@ -353,6 +420,8 @@ def generate_text_azure(pre, prompt, model="gpt-4"):
 ANTHROPIC_OPUS = "claude-3-opus-20240229"
 ANTHROPIC_SONNET = "claude-3-5-sonnet-20240620"
 AZURE_GPT4 = "gpt-4"
+AWS_JURASSIC2_MID = "ai21.j2-mid-v1"
+AWS_LLAMA2_70B = "meta.llama2-70b-chat-v1"
 GEMINI_PRO = "gemini-pro"
 GEMINI_FLASH = "gemini-1.5-flash-latest"
 OPEN_AI_GPT35TURBO = "gpt-3.5-turbo"
@@ -378,6 +447,14 @@ def action_anthropic_sonnet(system, user, output_style):
 
 def action_azure_gpt4(system, user, output_style):
     response = generate_text_azure(system, user + output_style, AZURE_GPT4)
+    return response
+
+def action_aws_jurassic2mid(system, user, output_style):
+    response = generate_text_aws(system, user + output_style, AWS_JURASSIC2_MID)
+    return response
+
+def action_aws_llama270b(system, user, output_style):
+    response = generate_text_aws(system, user + output_style, AWS_LLAMA2_70B)
     return response
 
 def action_gemini_pro(system, user, output_style,):
@@ -429,6 +506,8 @@ action_dict = {
     ANTHROPIC_OPUS: action_anthropic_opus,
     ANTHROPIC_SONNET: action_anthropic_sonnet,
     AZURE_GPT4: action_azure_gpt4,
+    AWS_JURASSIC2_MID: action_aws_jurassic2mid,
+    AWS_LLAMA2_70B: action_aws_llama270b,
     GEMINI_PRO: action_gemini_pro,
     GEMINI_FLASH: action_gemini_flash,
     OPEN_AI_GPT35TURBO: action_openai_35turbo,
@@ -495,7 +574,8 @@ def generate_text(models, system, user, output_style):
 
 
 # models = [    
-#     ANTHROPIC_OPUS,
+#     AWS_JURASSIC2_MID,
+#     AWS_LLAMA2_70B,
 #     AZURE_GPT4
 # ]
 
@@ -514,7 +594,7 @@ def generate_text(models, system, user, output_style):
 # After making changes to this notebook, run the following on the command-line to create the python script to use:
 # 
 # ```
-# jupyter nbconvert --to script .\multi_ai_hub.ipynb
+# jupyter nbconvert --to script ./multi_ai_hub.ipynb
 # ```
 
 # In[ ]:
