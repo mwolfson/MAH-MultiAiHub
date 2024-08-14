@@ -66,7 +66,13 @@ import multi_ai_hub as mah
 models = [
     mah.ANTHROPIC_OPUS,
     mah.ANTHROPIC_SONNET,    
-    mah.GEMINI_PRO
+    mah.GEMINI_PRO,
+    mah.OPEN_AI_GPT35TURBO,
+    mah.OPEN_AI_GPT4,
+    mah.OPEN_AI_GPT4PREVIEW
+    mah.MISTRAL_7B,
+    mah.MIXTRAL_8X7B,
+    mah.SONAR_MED_ONLINE
 ]
 
 # Common prompt elements
