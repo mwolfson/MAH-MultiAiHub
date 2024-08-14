@@ -21,17 +21,20 @@ If you have already setup the SDK for `Anthropic`, `OpenAI`, `Google Gemini` or 
 Copy the `multi_ai_hub.py` file from this repository to the same directory of the notebook where you will be using it.
 
 ### Currently Supported AI Vendors
-
-- [**Anthropic**](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
-- [**Google**](https://ai.google.dev/)
-- [**OpenAI**](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)
-- [**Perplexity**](https://docs.perplexity.ai/)
+- **Anthropic** | [API Docs](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
+- **AWS Bedrock** | [API Docs](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html)
+- **Azure** | [API Docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal)
+- **Google** | [API Docs](https://ai.google.dev/)
+- **OpenAI** | [API Docs](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)
+- **Perplexity** | [API Docs](https://docs.perplexity.ai/)
 
 #### Install the AI Vendor SDKs and set API Keys
 
 To use this tool, you will need to set environment variables with the API keys, and use `PIP` to install the correct packages for each vendor.
 
 Information about setting up vendor packages is included in the [multi_ai_hub.ipynb](./multi_ai_hub.ipynb) notebook. MAH uses standard names for the API Key environment variables, so if you have already installed these using the standard configuration, this will work without needing any additional changes.
+
+---
 
 ## Prompt Multiple AIs at Once
 
@@ -41,17 +44,29 @@ You can issue the same prompt to multiple AIs by giving a list of which models t
 # Import the code
 import multi_ai_hub as mah
 
+# Possible Models to use:
+# ANTHROPIC_OPUS = "claude-3-opus-20240229"
+# ANTHROPIC_SONNET = "claude-3-5-sonnet-20240620"
+# AZURE_GPT4 = "gpt-4"
+# AWS_JURASSIC2_MID = "ai21.j2-mid-v1"
+# AWS_LLAMA2_70B = "meta.llama2-70b-chat-v1"
+# GEMINI_PRO = "gemini-pro"
+# GEMINI_FLASH = "gemini-1.5-flash-latest"
+# OPEN_AI_GPT35TURBO = "gpt-3.5-turbo"
+# OPEN_AI_GPT4 = "gpt-4"
+# OPEN_AI_GPT4O = "gpt-4o"
+# OPEN_AI_GPT4PREVIEW = "gpt-4-0125-preview"
+# PPLX_LLAMA3_8B = "llama-3-8b-instruct"
+# PPLX_LLAMA3_70B = "llama-3-70b-instruct"
+# PPLX_MISTRAL_7B = "mistral-7b-instruct"
+# PPLX_MIXTRAL_8X7B = "mixtral-8x7b-instruct"
+# SONAR_MED_ONLINE = "sonar-medium-online"
+
 # List each model to test your prompt with
 models = [
     mah.ANTHROPIC_OPUS,
     mah.ANTHROPIC_SONNET,    
-    mah.GEMINI_PRO,
-    mah.OPEN_AI_GPT35TURBO,
-    mah.OPEN_AI_GPT4,
-    mah.OPEN_AI_GPT4PREVIEW
-    mah.MISTRAL_7B,
-    mah.MIXTRAL_8X7B,
-    mah.SONAR_MED_ONLINE
+    mah.GEMINI_PRO
 ]
 
 # Common prompt elements
@@ -118,6 +133,8 @@ Because they always find it an "arrr"-dventure! Yarrr!
 # MODEL: sonar-medium-online
 ARRRR! Ahoy there matey! What's better than finding gold on your ship? Finding out it was only fool's gold.
 ```
+
+--- 
 
 ### Prompt Single AI to get Raw result
 
